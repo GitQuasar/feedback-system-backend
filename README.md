@@ -1,2 +1,2 @@
 # feedback-system-backend
-Backend part of feedback-system
+Backend part of feedback system
