@@ -1,8 +1,10 @@
 # Здесь будет описываться логика для взаимодействия с БД
+from datetime import datetime
 from sqlalchemy import select
 from app.database import new_session
 import app.schemas as schemas
 import app.models as models
+from sqlalchemy import desc
 
 class AdminRepository:
 
@@ -50,7 +52,39 @@ class AdminRepository:
 
 #todo: реализовать функционал менеджера для взаимодействия с БД
 class ManagerRepository:
-    pass
+    @classmethod
+    async def see_Review(cls, id: int):
+        async with new_session() as session:
+            query = select(models.ReviewsRegistryORM).where(models.ReviewsRegistryORM.id == id)
+            result = await session.execute(query)
+            review = result.scalars().all()
+
+            if not review:
+                return "Review not found"
+            return review
+    
+    @classmethod
+    async def add_reply(cls, id: int, reply_text: str, manager_id: int):
+        async with new_session() as session:
+            reply = await session.get(models.ReviewsRegistryORM, id)
+            check_reply = reply.manager_reply_text
+            reply.manager_reply_text = reply_text
+            reply.replied_manager_id = manager_id
+            reply.manager_reply_datetime = datetime.now()
+            reply.review_status = 3
+            await session.commit()
+            
+            if check_reply == reply.manager_reply_text:
+                return "Error! Replay was not published"
+            return reply.review_status
+        
+    @classmethod
+    async def get_replied_on_page(cls, limit: int, page: int):
+        async with new_session() as session:
+            query = select(models.ReviewsRegistryORM).order_by(desc(models.ReviewsRegistryORM.id))
+            result = await session.execute(query)
+            page_reviews = result.scalars().all()[page*limit:][:limit]
+            return page_reviews
 
 class ReviewerRepository:
 
