@@ -1,6 +1,5 @@
-from sqlalchemy import Column, ForeignKey, MetaData
+from sqlalchemy import ForeignKey, MetaData
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.types import JSON
 from datetime import datetime
 
 from app.database import Base
@@ -12,34 +11,31 @@ from app.database import Base
 # Сюда запоминается вся информация о моделях
 metadata = MetaData()
 
-# Перечисление всех возможных статусов отзывов
-class ReviewsStatusesORM(Base):
-    __tablename__ = "reviews_statuses"
-    metadata
+# # Перечисление всех возможных статусов отзывов
+# class ReviewsStatusesORM(Base):
+#     __tablename__ = "reviews_statuses"
+#     metadata
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    status: Mapped[str]
-
-# Перечисление всех возможных ролей
-class RolesORM(Base):
-    __tablename__ = "roles"
-    metadata
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    role: Mapped[str]
-    permissions = Column(JSON, nullable=False)
+#     id: Mapped[int] = mapped_column(primary_key=True)
+#     status: Mapped[str]
 
 class StaffORM(Base):
     __tablename__ = "staff"
     metadata
     
     id: Mapped[int] = mapped_column(primary_key=True)
-    role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"))
 
-    email: Mapped[str]
-    password: Mapped[str]
     name: Mapped[str]
     lastname: Mapped[str]
+
+    email: Mapped[str]
+    # Хэшированный пароль хранится с типом bytes, а не str
+    hashed_password: Mapped[bytes]
+
+    is_admin: Mapped[bool]
+    is_manager: Mapped[bool]
+    is_verified: Mapped[bool]
+    is_active: Mapped[bool]
 
 class ReviewsRegistryORM(Base):
     __tablename__ = "reviews_registry"
@@ -48,7 +44,7 @@ class ReviewsRegistryORM(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
 
     review_creation_date: Mapped[datetime]
-    review_status: Mapped[int] = mapped_column(ForeignKey("reviews_statuses.id"))
+    review_status: Mapped[str]
     review_text: Mapped[str]
 
     # опциональные для заполнения заявителем поля

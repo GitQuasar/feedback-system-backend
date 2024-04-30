@@ -10,7 +10,7 @@ from app.configs.config import settings
 
 # ВАЖНО: импортируем ВСЕ файлы с МОДЕЛЯМИ, которые необходимо добавлять в миграции
 from app.database import Base # базовая модель, от нее всё наследуется
-from app.models import ReviewsStatusesORM, RolesORM, StaffORM, ReviewsRegistryORM
+from app.models import StaffORM, ReviewsRegistryORM
 
 config = context.config
 
@@ -29,7 +29,7 @@ if config.config_file_name is not None:
 Флаг "?async_fallback=True" добавляется для того, чтобы alembic
 корректно создавал миграции при использовании асинхронного драйвера
 """
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL_async + "?async_fallback=True")
+config.set_main_option("sqlalchemy.url", settings.DATABASE_URL_ASYNC + "?async_fallback=True")
 
 target_metadata = Base.metadata
 
