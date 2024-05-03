@@ -4,7 +4,3 @@ from fastapi import APIRouter
 router = APIRouter(
     tags=["Frontend"]  # добавляем тег для отображения в Swagger UI
 )
-
-# Аутентификация пользователя (для администраторов и менеджеров)
-def check_authentication():
-    pass

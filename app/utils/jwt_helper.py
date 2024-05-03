@@ -1,18 +1,7 @@
-from datetime import datetime, timedelta
-from time import time
-from fastapi import HTTPException, status
-from jose import JWTError, jwt
+from jose import jwt
+from datetime import datetime, timedelta, timezone
 
 from app.configs.config import settings
-
-SECRET_KEY = settings.SECRET
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-# JWT_TOKEN_PREFIX = "Bearer"
-
-class Token:
-    acces_token: str = None
-    token_type: str = None
 
 """
 JWT-токен - строка зашифрованных данных, состоящая из трех частей, которые разделены точкой:
@@ -55,24 +44,10 @@ Authorization: Bearer <token>
 """
 
 """
+Создание JWT-токена.
 После проверки пользователя мы генерируем JWT токен для управления сеансом.
 Этот токен отправляется обратно пользователю и используется в последующих запросах.
 """
-
-def create_access_token(data: dict) -> str:
-    """
-    Аргументы:
-    data: dict (набор данных, которые нужно зашифровать)
-    """
-
-    # Указываем время, после которого токен будет неактивен
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)   
-    data.update({"exp": expire})
-
-    # Шифруем токен, используя SECRET_KEY
-    # Подписываем токен, используя ALGORITHM
-    token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
-    return token
 
 """
 Декодирование JWT-токена.
@@ -83,21 +58,30 @@ def create_access_token(data: dict) -> str:
 Если запрос авторизованный, то веб-приложение позволяет клиенту получить доступ к защищенному маршруту.
 """
 
-def decode_and_verify_token(token: str):
-    """
-    Аргументы:
-    token: str (строка-токен)
-    """
-    try:
-        payload: dict = jwt.decode(token=token, key=SECRET_KEY, algorithms=ALGORITHM)
-    except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-            headers={"WWW-Authenticate": "Bearer"}
-        )
+# Кодирование набора данных в виде JWT
+def encode_jwt(payload: dict):
+    token: str = jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    return token
 
-    if payload['exp'] >= time():
-        return payload
+# Декодирование JWT в набор данных
+def decode_jwt(token: str):
+    payload: dict = jwt.decode(token=token, key=settings.SECRET_KEY, algorithms=settings.ALGORITHM)
+    return payload
+
+# Создание acces_token-а на основе переданного набора данных
+def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    payload = data.copy()
+    now = datetime.now(timezone.utc)
+    if expires_delta:
+        expire = now + expires_delta
     else:
-        return None
+        expire = now + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    
+    payload.update(
+        # Время создания токена
+        iat=now,
+        # Время жизни токена
+        exp=expire
+    )
+    access_token: str = encode_jwt(payload)
+    return access_token

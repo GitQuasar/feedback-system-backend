@@ -77,3 +77,8 @@ class AddManagerReply(Review):
     manager_reply_text: str
     replied_manager_id: str
     manager_reply_datetime: datetime
+
+class TokenInfo(BaseModel):
+    type: str
+    access_token: str
+    # refresh_token: str

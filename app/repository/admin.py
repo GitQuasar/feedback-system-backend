@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import async_session
 from app.models import StaffORM
 from app.schemas import AddStaff
-from app.utils.password_helper import get_password_hash
+from app.utils.pswd_helper import hash_password
 
 class AdminRepository:
     @classmethod
@@ -31,7 +31,7 @@ class AdminRepository:
     async def AddStaff(cls, data: AddStaff, session: AsyncSession):
         staff_dict = data.model_dump()
         password = staff_dict.pop("password")
-        staff_dict["hashed_password"] = get_password_hash(password)
+        staff_dict["hashed_password"] = hash_password(password)
 
         staff = StaffORM(**staff_dict)
         session.add(staff)
