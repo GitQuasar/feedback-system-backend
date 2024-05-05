@@ -1,3 +1,4 @@
+from typing import Annotated
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -11,13 +12,9 @@ from app.utils.jwt_helper import create_access_token
 
 router = APIRouter()
 
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/token"
-)
-
 @router.post("/token", response_model=TokenInfo)
 async def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(),
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     session: AsyncSession = Depends(get_async_session)
     ):
     user = await authenticate_user(session, email=form_data.username, password=form_data.password)
@@ -38,12 +35,6 @@ async def login_for_access_token(
     token = create_access_token(payload)
     
     return TokenInfo(type = "Bearer", access_token = token)
-
-@router.get("/admin/pc/", response_model=ReadStaff)
-async def read_current_admin_pc(
-    current_admin: StaffORM = Depends(get_current_active_administrator)
-    ):
-    return current_admin
 
 @router.get("/manager/pc/", response_model=ReadStaff)
 async def read_current_manager_pc(

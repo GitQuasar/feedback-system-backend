@@ -32,7 +32,7 @@ async def authenticate_user(session: AsyncSession, email: EmailStr, password: st
         return user
     return None
 
-# Получение текущего пользователя из БД по токену
+# Зависимость для получения текущего пользователя из БД по полученному токену
 async def get_current_user(
     session: AsyncSession = Depends(get_async_session),
     token: str = Depends(oauth2_scheme)

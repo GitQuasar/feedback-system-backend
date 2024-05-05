@@ -17,9 +17,7 @@ class StaffAuth(BaseModel):
 
 # Базовый класс для сотрудника
 # Добавление сотрудника
-class AddStaff(BaseModel):
-    email: EmailStr
-    password: str
+class AddStaff(StaffAuth):
     name: str
     lastname: str
     is_active: Optional[bool] = True
@@ -50,7 +48,6 @@ class UpdateStaff(BaseModel):
 # Сотрудник
 class Staff(AddStaff):
     id: int
-    model_config = ConfigDict(from_attributes=True)
 
 
 ### СХЕМЫ ДЛЯ ОТЗЫВОВ ###
@@ -66,17 +63,16 @@ class AddReview(BaseModel):
     name: Optional[str] = None
     lastname: Optional[str] = None
 
-# Отзыв
+# Добавление ответа на отзыв
+class ManagerReply(BaseModel):
+    # Поля, заполняемые в момент ответа менеджера на отзыв
+    review_status: Status
+    manager_reply_text: str
+    replied_manager_id: int
+    manager_reply_datetime: datetime
+
 class Review(AddReview):
     id: int
-    model_config = ConfigDict(from_attributes=True)
-
-# Добавление ответа на отзыв
-class AddManagerReply(Review):
-    # Поля, заполняемые в момент ответа менеджера на отзыв
-    manager_reply_text: str
-    replied_manager_id: str
-    manager_reply_datetime: datetime
 
 class TokenInfo(BaseModel):
     type: str

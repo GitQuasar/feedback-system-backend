@@ -2,8 +2,7 @@ from fastapi import status, HTTPException
 
 InvalidUserTypeException = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST,
-    detail="Invalid user type",
-    headers={"WWW-Authenticate": "Bearer"})
+    detail="Invalid user type")
 
 InactiveUserException = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST,
@@ -25,10 +24,20 @@ UnauthorizedException = HTTPException(
 
 UserNotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
-    detail="User with such credentials not found",
-    headers={"WWW-Authenticate": "Bearer"})
+    detail="User not found")
+
+ReviewNotFoundException = HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND,
+    detail="Review not found")
+
+NoStaffInTheDatabaseException = HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND,
+    detail="How did that happen?")
+
+CannotDeleteCurrentUserException = HTTPException(
+    status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+    detail="Cannot delete current user")
 
 UserAlreadyExistsException = HTTPException(
     status_code=status.HTTP_409_CONFLICT,
-    detail="User already exists",
-    headers={"WWW-Authenticate": "Bearer"})
+    detail="User already exists")
