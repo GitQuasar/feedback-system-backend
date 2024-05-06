@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
 from app.utils.enums import Status
@@ -10,14 +10,11 @@ from app.utils.enums import Status
 
 ### СХЕМЫ ДЛЯ СОТРУДНИКОВ ###
 
-# Авторизация сотрудника
-class StaffAuth(BaseModel):
-    email: EmailStr
-    password: str
-
 # Базовый класс для сотрудника
 # Добавление сотрудника
-class AddStaff(StaffAuth):
+class AddStaff(BaseModel):
+    email: EmailStr
+    password: str
     name: str
     lastname: str
     is_active: Optional[bool] = True

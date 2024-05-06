@@ -13,7 +13,7 @@ from app import http_exceptions as http_e
 
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/token"
+    tokenUrl="/api/token"
 )
 
 # Функция-помощник, возвращает пользователя из БД по email (иначе None)

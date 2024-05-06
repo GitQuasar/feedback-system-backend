@@ -1,13 +1,12 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm
 
 from app.database import get_async_session
 from app import http_exceptions as http_e
-from app.models import StaffORM
-from app.repository.auth import authenticate_user, get_current_active_administrator, get_current_active_manager
-from app.schemas import ReadStaff, TokenInfo
+from app.repository.auth import authenticate_user
+from app.schemas import TokenInfo
 from app.utils.jwt_helper import create_access_token
 
 router = APIRouter()
@@ -35,9 +34,3 @@ async def login_for_access_token(
     token = create_access_token(payload)
     
     return TokenInfo(type = "Bearer", access_token = token)
-
-@router.get("/manager/pc/", response_model=ReadStaff)
-async def read_current_manager_pc(
-    current_manager: StaffORM = Depends(get_current_active_manager)
-    ):
-    return current_manager
