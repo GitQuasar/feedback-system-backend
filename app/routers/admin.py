@@ -47,7 +47,7 @@ async def read_staff_by_id(id: int, session: AsyncSession = Depends(get_async_se
 # Добавление сотрудника в БД
 @router.post(
         path="/admin/actions/add_staff",
-        # dependencies=[Depends(get_current_active_administrator)],
+        dependencies=[Depends(get_current_active_administrator)],
         response_model=ReadStaff
         )
 async def add_staff(
