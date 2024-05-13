@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
+    REFRESH_TOKEN_EXPIRE_DAYS: int
+    REVIEWS_ON_PAGE_LIMIT: int
+    STAFF_ON_PAGE_LIMIT: int
 
     @property
     def DATABASE_URL_ASYNC(self):
@@ -30,6 +33,18 @@ class Settings(BaseSettings):
     @property
     def ACCESS_TOKEN_EXPIRE_MINUTES(self):
         return self.ACCESS_TOKEN_EXPIRE_MINUTES
+
+    @property
+    def REVIEWS_ON_PAGE_LIMIT(self):
+        return self.REVIEWS_ON_PAGE_LIMIT
+    
+    @property
+    def STAFF_ON_PAGE_LIMIT(self):
+        return self.STAFF_ON_PAGE_LIMIT
+    
+    @property
+    def REFRESH_TOKEN_EXPIRE_DAYS(self):
+        return self.REFRESH_TOKEN_EXPIRE_DAYS
     
     model_config = SettingsConfigDict(env_file=".env")
 

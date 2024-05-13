@@ -1,3 +1,4 @@
+from pydantic import UUID4
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import ReviewsRegistryORM
@@ -10,6 +11,9 @@ class ReviewerRepository:
         review_dict = data.model_dump()
         review = ReviewsRegistryORM(**review_dict)
         session.add(review)
-        await session.flush()
         await session.commit()
+    
+    @classmethod
+    async def GetReviewByUUID(cls, session: AsyncSession, uuid: UUID4):
+        review = await session.get(ReviewsRegistryORM, uuid)
         return review

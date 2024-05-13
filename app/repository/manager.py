@@ -1,28 +1,38 @@
-from sqlalchemy import select, desc
+from sqlalchemy import select, desc, UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import ReviewsRegistryORM
 from app.schemas import ManagerReply
+from app.configs.config import settings
 
 class ManagerRepository:
     @classmethod
-    async def GetReviewsOnPage(cls, session: AsyncSession, limit: int, page: int):
-        query = select(ReviewsRegistryORM).order_by(desc(ReviewsRegistryORM.id))
+    async def GetReviewsOnPage(
+        cls,
+        session: AsyncSession,
+        page: int,
+        limit: int | None = settings.REVIEWS_ON_PAGE_LIMIT
+        ):
+        query = select(ReviewsRegistryORM).order_by(desc(ReviewsRegistryORM.uuid))
         result = await session.execute(query)
         reviews_on_page = result.scalars().all()[page*limit:][:limit]
         return reviews_on_page
     
     @classmethod
-    async def GetReviewByID(cls, session: AsyncSession, id: int):
-        review = await session.get(ReviewsRegistryORM, id)
+    async def GetReviewByUUID(cls, session: AsyncSession, uuid: UUID):
+        review = await session.get(ReviewsRegistryORM, uuid)
         return review
     
     @classmethod
-    async def AddReplyOnReviewByID(cls, session: AsyncSession, review_id: int, manager_reply: ManagerReply):
+    async def AddReplyOnReviewByUUID(
+        cls,
+        session: AsyncSession,
+        review_uuid: UUID,
+        manager_reply: ManagerReply
+        ):
 
-        review_in_db = await session.get(ReviewsRegistryORM, review_id)
-        if review_in_db.manager_reply_text == manager_reply.manager_reply_text:
-            return None
+        review_in_db = await session.get(ReviewsRegistryORM, review_uuid)
+        if review_in_db is None: return None
         
         reply_data = manager_reply.model_dump()
 

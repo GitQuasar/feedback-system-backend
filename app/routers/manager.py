@@ -1,4 +1,6 @@
 from datetime import datetime
+from typing import List
+from pydantic import UUID4
 from fastapi import APIRouter, Depends, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -6,41 +8,52 @@ from app.models import StaffORM
 from app.repository.auth import get_current_active_manager
 from app.repository.manager import ManagerRepository
 from app.database import get_async_session
-from app.schemas import ManagerReply, ReadStaff
+from app.schemas import ManagerReply, ReadStaff, Review
 from app import http_exceptions as http_e
 from app.utils.enums import Status
 
 router = APIRouter()
 
-@router.get("/manager/pc/", response_model=ReadStaff)
+@router.get(
+        path="/manager/pc/",
+        response_model=ReadStaff
+        )
 async def read_current_manager_pc(current_manager: StaffORM = Depends(get_current_active_manager)):
     return current_manager
 
-@router.get("/manager/actions/see_reviews", dependencies=[Depends(get_current_active_manager)])
+@router.get(
+        path="/manager/actions/see_reviews",
+        dependencies=[Depends(get_current_active_manager)],
+        response_model=List[Review]
+        )
 async def see_reviews_on_page(
-    limit: int,
     page: int,
     session: AsyncSession = Depends(get_async_session)
     ):
+    reviews_on_page = await ManagerRepository.GetReviewsOnPage(session, page-1)
+    return reviews_on_page
 
-    reviews_on_page = await ManagerRepository.GetReviewsOnPage(session, limit, page-1)
-    return {"reviews_on_page": reviews_on_page}
-
-@router.get("/manager/actions/see_reviews/{id}", dependencies=[Depends(get_current_active_manager)])
-async def see_review_by_id(
-    id: int,
+@router.get(
+        path="/manager/actions/see_reviews/{id}",
+        dependencies=[Depends(get_current_active_manager)],
+        response_model=Review
+        )
+async def see_review_by_uuid(
+    uuid: UUID4,
     session: AsyncSession = Depends(get_async_session)
     ):
-
-    review = await ManagerRepository.GetReviewByID(session, id)
+    review = await ManagerRepository.GetReviewByUUID(session, uuid)
     if review is None:
         raise http_e.ReviewNotFoundException
-    return {"review": review}
+    return review
 
-@router.post("/manager/actions/add_reply")
+@router.post(
+        path="/manager/actions/add_reply",
+        response_model=Review
+        )
 async def create_manager_reply(
+    review_uuid: UUID4,
     reply_text: str = Form(min_length=16, max_length=255),
-    review_id: int = Form(),
     current_user: StaffORM = Depends(get_current_active_manager),
     session: AsyncSession = Depends(get_async_session)
     ):
@@ -52,8 +65,8 @@ async def create_manager_reply(
         manager_reply_datetime = datetime.utcnow()
     )
 
-    review_updated = await ManagerRepository.AddReplyOnReviewByID(session, review_id, manager_reply)
+    review_updated = await ManagerRepository.AddReplyOnReviewByUUID(session, review_uuid, manager_reply)
     if review_updated is None:
-        return {"message" : "Review was not changed due to similar reply text"}
-    return {"review_updated": review_updated}
+        raise http_e.ReviewNotFoundException
+    return review_updated
 

@@ -58,6 +58,9 @@ Authorization: Bearer <token>
 Если запрос авторизованный, то веб-приложение позволяет клиенту получить доступ к защищенному маршруту.
 """
 
+ACCESS_TOKEN_TYPE: str = "Access"
+REFRESH_TOKEN_TYPE: str = "Refresh"
+
 # Кодирование набора данных в виде JWT
 def encode_jwt(payload: dict):
     token: str = jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
@@ -78,6 +81,8 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
         expire = now + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     
     payload.update(
+        # Тип токена
+        token_type=ACCESS_TOKEN_TYPE,
         # Время создания токена
         iat=now,
         # Время жизни токена
@@ -85,3 +90,48 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     )
     access_token: str = encode_jwt(payload)
     return access_token
+
+def create_refresh_token(data: dict, expires_delta: timedelta | None = None):
+    payload = data.copy()
+    now = datetime.now(timezone.utc)
+    if expires_delta:
+        expire = now + expires_delta
+    else:
+        expire = now + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+    
+    payload.update(
+        # Тип токена
+        token_type=REFRESH_TOKEN_TYPE,
+        # Время создания токена
+        iat=now,
+        # Время жизни токена
+        exp=expire
+    )
+    access_token: str = encode_jwt(payload)
+    return access_token
+
+# def verify_refresh_token(token:str):
+#     # credential_exception = HTTPException(
+#     #     status_code=status.HTTP_401_UNAUTHORIZED,
+#     #     detail="Could not validate credentials",
+#     #     headers={"WWW-Authenticate": "Bearer"}        
+#     # )
+#     try:
+#         payload = decode_jwt(token)
+#         id: str = payload.get("id")
+#         if id is None:
+#             raise http_exceptions
+#         token_data = TokenData(id=id)
+#     except JWTError:
+#         raise credential_exception
+
+#     return token_data
+
+# def get_new_access_token(token:str):
+#     credentials_exception = HTTPException(
+#         status_code=status.HTTP_401_UNAUTHORIZED,
+#         detail="Could not validate refresh credentials",
+#         headers={"WWW-Authenticate": "Bearer"}        
+#     )
+#     token_data = verify_refresh_token(token, credentials_exception)
+#     return create_access_token(token_data)

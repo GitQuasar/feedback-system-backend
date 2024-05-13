@@ -9,7 +9,7 @@ from app.routers.reveiwer import router as reviewer_router
 
 # Точка взаимодействия с приложением
 app = FastAPI(
-    title="ITeam Feedback System"
+    title="ITeam Feedback System API"
 )
 
 app.include_router(login_router, prefix="/api", tags=["Login Router"])

@@ -15,7 +15,7 @@ InvalidCredentialsException = HTTPException(
 
 InvalidTokenException = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
-    detail="Invalid token",
+    detail="Token is either expired or invalid",
     headers={"WWW-Authenticate": "Bearer"})
 
 UnauthorizedException = HTTPException(
