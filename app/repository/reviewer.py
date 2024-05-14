@@ -12,6 +12,7 @@ class ReviewerRepository:
         review = ReviewsRegistryORM(**review_dict)
         session.add(review)
         await session.commit()
+        return review.uuid
     
     @classmethod
     async def GetReviewByUUID(cls, session: AsyncSession, uuid: UUID4):

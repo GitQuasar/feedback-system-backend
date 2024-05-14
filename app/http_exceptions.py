@@ -40,4 +40,4 @@ CannotDeleteCurrentUserException = HTTPException(
 
 UserAlreadyExistsException = HTTPException(
     status_code=status.HTTP_409_CONFLICT,
-    detail="User already exists")
+    detail="User with such email address already exists")

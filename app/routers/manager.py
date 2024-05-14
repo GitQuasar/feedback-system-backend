@@ -27,7 +27,7 @@ async def read_current_manager_pc(current_manager: StaffORM = Depends(get_curren
         response_model=List[Review]
         )
 async def see_reviews_on_page(
-    page: int,
+    page: int | None = 1,
     session: AsyncSession = Depends(get_async_session)
     ):
     reviews_on_page = await ManagerRepository.GetReviewsOnPage(session, page-1)

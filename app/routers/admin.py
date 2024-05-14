@@ -1,13 +1,14 @@
 from typing import List
 from fastapi import APIRouter, Depends, Form
 from pydantic import EmailStr
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_async_session
 from app.models import StaffORM
 from app.repository.admin import AdminRepository
 from app.repository.auth import get_current_active_administrator, get_user_from_database
-from app.schemas import AddStaff, ReadStaff
+from app.schemas import AddStaff, ReadStaff, UpdateStaff
 from app.utils.enums import Role
 from app import http_exceptions as http_e
 
@@ -47,7 +48,7 @@ async def read_staff_by_id(id: int, session: AsyncSession = Depends(get_async_se
 # Добавление сотрудника в БД
 @router.post(
         path="/admin/actions/add_staff",
-        # dependencies=[Depends(get_current_active_administrator)],
+        dependencies=[Depends(get_current_active_administrator)],
         response_model=ReadStaff
         )
 async def add_staff(
@@ -93,3 +94,38 @@ async def delete_staff_by_id(
     deleted = await AdminRepository.DeleteStaffByID(id, session)
     if deleted is None:
         raise http_e.UserNotFoundException
+
+@router.put(
+    path="/admin/actions/update_staff/{id}",
+    dependencies=[Depends(get_current_active_administrator)],
+    response_model=ReadStaff
+)
+async def update_staff_by_id(
+    id: int,
+    session: AsyncSession = Depends(get_async_session),
+    email: EmailStr = Form(default=None),
+    password: str = Form(default=None, min_length=8, max_length=32),
+    first_name: str = Form(default=None, min_length=2, max_length=32),
+    last_name: str = Form(default=None, min_length=2, max_length=32),
+    patronymic: str = Form(default=None, min_length=2, max_length=32)
+):  
+    update_info = UpdateStaff(
+        email=email,
+        password=password,
+        first_name=first_name,
+        last_name=last_name,
+        patronymic=patronymic
+    )
+
+    if email is not None:
+        staff_with_similar_email = (
+        await session.execute(select(StaffORM).where(StaffORM.email == email))
+        ).scalars().first()
+        if staff_with_similar_email is not None:
+            raise http_e.UserAlreadyExistsException
+
+    staff_updated = await AdminRepository.UpdateStaffByID(id, session, update_info)
+
+    if staff_updated is None:
+        raise http_e.UserNotFoundException
+    return staff_updated
