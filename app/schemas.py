@@ -55,6 +55,7 @@ class AddReview(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     patronymic: Optional[str] = None
+    department: Optional[str] = None
 
 # Добавление ответа на отзыв
 class ManagerReply(BaseModel):
@@ -69,10 +70,12 @@ class Review(BaseModel):
     review_creation_date: datetime
     review_status: Status
     review_text: str
+    
     email: Optional[str] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     patronymic: Optional[str] = None
+    department: Optional[str] = None
 
     manager_reply_text: Optional[str] = None
     replied_manager_id: Optional[int] = None

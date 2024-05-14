@@ -46,6 +46,7 @@ class ReviewsRegistryORM(Base):
     first_name: Mapped[str | None]
     last_name: Mapped[str | None]
     patronymic: Mapped[str | None]
+    department: Mapped[str | None]
 
     # Поля, заполняемые в момент ответа менеджера на отзыв
     manager_reply_text: Mapped[str | None]

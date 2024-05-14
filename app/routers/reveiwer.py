@@ -1,7 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, Form
 from pydantic import EmailStr, UUID4
-from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_async_session
@@ -20,10 +19,11 @@ router = APIRouter()
 async def create_review(
     review_text: str = Form(min_length=16, max_length=255),
     # Опциональные для заполнения заявителем поля
-    email: Optional[EmailStr] = Form(default=None),
-    first_name: Optional[str] = Form(default=None, min_length=2, max_length=32),
-    last_name: Optional[str] = Form(default=None, min_length=2, max_length=32),
-    patronymic: Optional[str] = Form(default=None, min_length=2, max_length=32),
+    email: EmailStr = Form(default=None),
+    first_name: str = Form(default=None, min_length=2, max_length=32),
+    last_name: str = Form(default=None, min_length=2, max_length=32),
+    patronymic: str = Form(default=None, min_length=2, max_length=32),
+    department: str = Form(default=None, min_length=2, max_length=64, description="Department of... "),
     session: AsyncSession = Depends(get_async_session)
     ):
 
@@ -35,7 +35,8 @@ async def create_review(
         email = email,
         first_name = first_name,
         last_name = last_name,
-        patronymic = patronymic
+        patronymic = patronymic,
+        department = department
     )
 
     review_uuid = await ReviewerRepository.AddReview(session, review)
