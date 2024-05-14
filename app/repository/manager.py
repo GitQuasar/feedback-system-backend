@@ -13,7 +13,7 @@ class ManagerRepository:
         page: int,
         limit: int | None = settings.REVIEWS_ON_PAGE_LIMIT
         ):
-        query = select(ReviewsRegistryORM).order_by(desc(ReviewsRegistryORM.uuid))
+        query = select(ReviewsRegistryORM).order_by(desc(ReviewsRegistryORM.review_creation_date))
         result = await session.execute(query)
         reviews_on_page = result.scalars().all()[page*limit:][:limit]
         return reviews_on_page

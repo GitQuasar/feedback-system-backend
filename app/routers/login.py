@@ -27,11 +27,10 @@ async def login_for_access_token(
     token_payload = {
         # "sub" (subject) - то, о ком этот токен (будем использовать ID пользователя)
         "sub": str(user.id),
-        "email": user.email,
-        "role": role
+        "email": user.email
     }
 
     access_token = create_access_token(token_payload)
     refresh_token = create_refresh_token(token_payload)
     
-    return TokenInfo(type="Bearer", access_token=access_token, refresh_token=refresh_token)
+    return TokenInfo(type="Bearer", role=role, access_token=access_token, refresh_token=refresh_token)

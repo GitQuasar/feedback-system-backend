@@ -70,7 +70,7 @@ class Review(BaseModel):
     review_creation_date: datetime
     review_status: Status
     review_text: str
-    
+
     email: Optional[str] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None
@@ -83,5 +83,6 @@ class Review(BaseModel):
 
 class TokenInfo(BaseModel):
     type: str
+    role: str
     access_token: str
     refresh_token: str
