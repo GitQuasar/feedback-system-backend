@@ -7,6 +7,7 @@ from app.database import get_async_session
 from app import http_exceptions as http_e
 from app.repository.auth import authenticate_user
 from app.schemas import TokenInfo
+from app.utils.enums import Role
 from app.utils.jwt_helper import create_access_token, create_refresh_token
 
 router = APIRouter()
@@ -21,11 +22,13 @@ async def login_for_access_token(
     # Бросаем исключение, если (либо...либо):
     # Пользователя нет в БД, введённые данные неверны
     if not user: raise http_e.InvalidCredentialsException
+    role: str = Role.Admin if user.is_admin == True else Role.Manager 
 
     token_payload = {
         # "sub" (subject) - то, о ком этот токен (будем использовать ID пользователя)
         "sub": str(user.id),
-        "email" : user.email
+        "email": user.email,
+        "role": role
     }
 
     access_token = create_access_token(token_payload)
