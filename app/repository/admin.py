@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import StaffORM
-from app.schemas import AddStaff
+from app.schemas import AddStaff, UpdateStaff
 from app.utils.pswd_helper import hash_password
 
 class AdminRepository:
@@ -31,9 +31,28 @@ class AdminRepository:
         
     @classmethod
     async def DeleteStaffByID(cls, id: int, session: AsyncSession):
-        to_delete = (await session.execute(select(StaffORM).where(StaffORM.id == id))).scalars().first()
-        if to_delete is None:
-            return None
-        await session.delete(to_delete)
+        staff_in_db = await session.get(StaffORM, id)
+        if staff_in_db is None: return None
+        await session.delete(staff_in_db)
         await session.commit()
-        return to_delete
+        return staff_in_db
+    
+    @classmethod
+    async def UpdateStaffByID(
+        cls,
+        id: int,
+        session: AsyncSession,
+        update_data: UpdateStaff
+        ):
+        
+        staff_in_db = await session.get(StaffORM, id)
+        if staff_in_db is None: return None
+        
+        update_dict = update_data.model_dump()
+        for key, value in update_dict.items():
+            if value: setattr(staff_in_db, key, value)
+        
+        await session.commit()
+
+        return staff_in_db
+        

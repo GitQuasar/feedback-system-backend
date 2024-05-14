@@ -14,7 +14,8 @@ from app import http_exceptions as http_e
 router = APIRouter()
 
 @router.post(
-        path="/reviews/actions/create_review"
+        path="/reviews/actions/create_review",
+        response_model=str
         )
 async def create_review(
     review_text: str = Form(min_length=16, max_length=255),
@@ -37,7 +38,8 @@ async def create_review(
         patronymic = patronymic
     )
 
-    await ReviewerRepository.AddReview(session, review)
+    review_uuid = await ReviewerRepository.AddReview(session, review)
+    return str(review_uuid)
 
 @router.get(
         path="/reviews/actions/see_review/{id}",
