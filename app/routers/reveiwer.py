@@ -76,7 +76,7 @@ async def create_review(
 
     BACKEND_ENDPOINT = "api/reviews/actions/see_review/id?uuid="
     FRONTEND_ENDPOINT = "frontend_endpoint"
-    review_link = f"{settings.WEB_APP_URL}/{settings.FRONTEND_PORT}/{FRONTEND_ENDPOINT}/{review_uuid}"
+    review_link = f"{settings.WEB_APP_URL}:{settings.FRONTEND_PORT}/{FRONTEND_ENDPOINT}/{review_uuid}"
 
     # Создаём QR
     QR_Bytes = segno.make(content=review_link, micro=False)
