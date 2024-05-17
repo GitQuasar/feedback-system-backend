@@ -1,16 +1,12 @@
 from uuid import uuid4
-from sqlalchemy import UUID
+from sqlalchemy import JSON, UUID, Column
 from sqlalchemy import ForeignKey, MetaData
 from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime
 
 from app.database import Base
 
-"""
-Здесь описываются МОДЕЛИ - то, на основе чего будут создаваться таблицы в БД. Модели наследуются от базовой модели Base.
-Отдельная модель соответствует определенной таблице в БД. Объекты моделей соответствуют столбцам таблицы.
-"""
-# Сюда запоминается вся информация о моделях
+# Сюда запоминаются данные об изменениях в моделях (для миграций)
 metadata = MetaData()
 
 class StaffORM(Base):
@@ -47,6 +43,8 @@ class ReviewsRegistryORM(Base):
     last_name: Mapped[str | None]
     patronymic: Mapped[str | None]
     department: Mapped[str | None]
+
+    images = Column(JSON)
 
     # Поля, заполняемые в момент ответа менеджера на отзыв
     manager_reply_text: Mapped[str | None]

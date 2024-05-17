@@ -1,6 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Класс, предоставляющий конфигурационную информацию
 class Settings(BaseSettings):
     # Берём информацию из файла .env
     DATABASE: str
@@ -16,10 +15,13 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int
     REVIEWS_ON_PAGE_LIMIT: int
     STAFF_ON_PAGE_LIMIT: int
+    MAXIMUM_UPLOAD_FILE_SIZE_BYTES: int
+    WEB_APP_URL: str
+    FRONTEND_PORT: str
+    BACKEND_PORT: str
 
     @property
     def DATABASE_URL_ASYNC(self):
-        # DSN
         return f"{self.DATABASE}+{self.DB_DRIVER}://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     @property
@@ -45,6 +47,22 @@ class Settings(BaseSettings):
     @property
     def REFRESH_TOKEN_EXPIRE_DAYS(self):
         return self.REFRESH_TOKEN_EXPIRE_DAYS
+
+    @property
+    def MAXIMUM_UPLOAD_FILE_SIZE_BYTES(self):
+        return self.MAXIMUM_UPLOAD_FILE_SIZE_BYTES
+    
+    @property
+    def WEB_APP_URL(self):
+        return self.WEB_APP_URL
+
+    @property
+    def FRONTEND_PORT(self):
+        return self.FRONTEND_PORT
+    
+    @property
+    def BACKEND_PORT(self):
+        return self.BACKEND_PORT
     
     model_config = SettingsConfigDict(env_file=".env")
 

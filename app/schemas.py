@@ -1,17 +1,9 @@
 from typing import Optional
-from pydantic import UUID4, BaseModel, ConfigDict, EmailStr
+from pydantic import UUID4, BaseModel, ConfigDict, EmailStr, JsonValue
 from datetime import datetime
 
 from app.utils.enums import Status
 
-"""
-Схемы используются для валидации ввода pydantic-ом
-"""
-
-### СХЕМЫ ДЛЯ СОТРУДНИКОВ ###
-
-# Базовый класс для сотрудника
-# Добавление сотрудника
 class AddStaff(BaseModel):
     email: EmailStr
     password: str
@@ -42,24 +34,19 @@ class UpdateStaff(BaseModel):
     last_name: Optional[str]
     patronymic: Optional[str]
 
-### СХЕМЫ ДЛЯ ОТЗЫВОВ ###
-
-# Базовый класс для отзыва
-# Добавление отзыва
 class AddReview(BaseModel):
     review_creation_date: datetime
     review_status: Status
     review_text: str
-    # опциональные для заполнения заявителем поля
+
     email: Optional[str] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     patronymic: Optional[str] = None
     department: Optional[str] = None
+    images: Optional[JsonValue] = None
 
-# Добавление ответа на отзыв
 class ManagerReply(BaseModel):
-    # Поля, заполняемые в момент ответа менеджера на отзыв
     review_status: Status
     manager_reply_text: str
     replied_manager_id: int
@@ -76,6 +63,7 @@ class Review(BaseModel):
     last_name: Optional[str] = None
     patronymic: Optional[str] = None
     department: Optional[str] = None
+    images: Optional[JsonValue] = None
 
     manager_reply_text: Optional[str] = None
     replied_manager_id: Optional[int] = None
@@ -86,3 +74,8 @@ class TokenInfo(BaseModel):
     role: str
     access_token: str
     refresh_token: str
+
+class QRImageData(BaseModel):
+    review_uuid: str
+    mime: str
+    image_base64_bytes: bytes
