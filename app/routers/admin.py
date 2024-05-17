@@ -17,7 +17,8 @@ router = APIRouter()
 # Получение информации о текущем активном администраторе
 @router.get(
         path="/admin/pc/",
-        response_model=ReadStaff
+        response_model=ReadStaff,
+        dependencies=[Depends(get_current_active_administrator)]
         )
 async def read_current_admin_pc(current_admin: StaffORM = Depends(get_current_active_administrator)):
     return current_admin
@@ -95,7 +96,7 @@ async def delete_staff_by_id(
     if deleted is None:
         raise http_e.UserNotFoundException
 
-@router.put(
+@router.patch(
     path="/admin/actions/update_staff/{id}",
     dependencies=[Depends(get_current_active_administrator)],
     response_model=ReadStaff
@@ -121,7 +122,7 @@ async def update_staff_by_id(
         staff_with_similar_email = (
         await session.execute(select(StaffORM).where(StaffORM.email == email))
         ).scalars().first()
-        if staff_with_similar_email is not None:
+        if staff_with_similar_email is not None and staff_with_similar_email.id != id:
             raise http_e.UserAlreadyExistsException
 
     staff_updated = await AdminRepository.UpdateStaffByID(id, session, update_info)

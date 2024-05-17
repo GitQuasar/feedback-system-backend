@@ -49,6 +49,9 @@ class AdminRepository:
         if staff_in_db is None: return None
         
         update_dict = update_data.model_dump()
+        password = update_dict.pop("password")
+        update_dict["hashed_password"] = hash_password(password)
+        
         for key, value in update_dict.items():
             if value: setattr(staff_in_db, key, value)
         
