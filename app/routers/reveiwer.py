@@ -23,7 +23,7 @@ router = APIRouter()
         )
 async def create_review(
     files_upload: List[UploadFile] = File(default=None, description="Important: Unset 'Send empty value', otherwise won't work"),
-    review_text: str = Form(min_length=8, max_length=255),
+    review_text: str = Form(min_length=8, max_length=5000),
     # Опциональные для заполнения заявителем поля
     email: EmailStr = Form(default=None),
     first_name: str = Form(default=None, min_length=2, max_length=32),

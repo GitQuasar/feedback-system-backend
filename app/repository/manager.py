@@ -10,12 +10,13 @@ class ManagerRepository:
     async def GetReviewsOnPage(
         cls,
         session: AsyncSession,
-        page: int,
-        limit: int | None = settings.REVIEWS_ON_PAGE_LIMIT
+        # page: int,
+        # limit: int | None = settings.REVIEWS_ON_PAGE_LIMIT
         ):
         query = select(ReviewsRegistryORM).order_by(desc(ReviewsRegistryORM.review_creation_date))
         result = await session.execute(query)
-        reviews_on_page = result.scalars().all()[page*limit:][:limit]
+        # reviews_on_page = result.scalars().all()[page*limit:][:limit]
+        reviews_on_page = result.scalars().all()
         return reviews_on_page
     
     @classmethod
