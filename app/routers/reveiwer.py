@@ -7,6 +7,7 @@ from pydantic import EmailStr, UUID4
 from sqlalchemy.ext.asyncio import AsyncSession
 import segno
 import uuid
+from pathlib import Path
 
 from app.database import get_async_session
 from app.repository.reviewer import ReviewerRepository
@@ -49,11 +50,11 @@ async def create_review(
                 raise http_e.FileSizeCapOverflowException(filename=file.filename, max_size=settings.MAXIMUM_UPLOAD_FILE_SIZE_BYTES)
 
         # Путь до папки с изображениями относительно данного файла
-        IMAGES_DIRECTORY = "images/"
+        IMAGES_DIRECTORY = Path(__file__).parent.parent.parent.parent / 'feedback-system-frontend' / 'public' / 'images'
         for file in files_upload:
             file_contents = file.file.read()
             filename_random = f"{str(uuid.uuid4())}_{file.filename}"
-            with open(f"{IMAGES_DIRECTORY}{filename_random}", 'wb') as file_object:
+            with open(IMAGES_DIRECTORY / filename_random, 'wb') as file_object:
                 file_object.write(file_contents)
                 file_object.close()
             
