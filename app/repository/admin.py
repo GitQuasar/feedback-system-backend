@@ -50,10 +50,13 @@ class AdminRepository:
         
         update_dict = update_data.model_dump()
         password = update_dict.pop("password")
-        update_dict["hashed_password"] = hash_password(password)
+        if password is not None:
+            update_dict["hashed_password"] = hash_password(password)
+        else:
+            update_dict["hashed_password"] = None
         
         for key, value in update_dict.items():
-            if value: setattr(staff_in_db, key, value)
+            if value is not None: setattr(staff_in_db, key, value)
         
         await session.commit()
 

@@ -80,21 +80,21 @@ async def add_staff(
     staff = await AdminRepository.AddStaff(staff_data, session)
     return staff
 
-# Удаление сотрудника из БД по ID
-@router.delete(
-        path="/admin/actions/delete_staff/{id}"
-        )
-async def delete_staff_by_id(
-    id: int,
-    current_user: StaffORM = Depends(get_current_active_administrator),
-    session: AsyncSession = Depends(get_async_session)
-    ):
-    if id == current_user.id:
-        raise http_e.CannotDeleteCurrentUserException
+# # Удаление сотрудника из БД по ID
+# @router.delete(
+#         path="/admin/actions/delete_staff/{id}"
+#         )
+# async def delete_staff_by_id(
+#     id: int,
+#     current_user: StaffORM = Depends(get_current_active_administrator),
+#     session: AsyncSession = Depends(get_async_session)
+#     ):
+#     if id == current_user.id:
+#         raise http_e.CannotDeleteCurrentUserException
     
-    deleted = await AdminRepository.DeleteStaffByID(id, session)
-    if deleted is None:
-        raise http_e.UserNotFoundException
+#     deleted = await AdminRepository.DeleteStaffByID(id, session)
+#     if deleted is None:
+#         raise http_e.UserNotFoundException
 
 @router.patch(
     path="/admin/actions/update_staff/{id}",
@@ -108,15 +108,21 @@ async def update_staff_by_id(
     password: str = Form(default=None, min_length=8, max_length=32),
     first_name: str = Form(default=None, min_length=2, max_length=32),
     last_name: str = Form(default=None, min_length=2, max_length=32),
-    patronymic: str = Form(default=None, min_length=2, max_length=32)
+    patronymic: str = Form(default=None, min_length=2, max_length=32),
+    is_active: bool = Form(),
+    current_administrator: StaffORM = Depends(get_current_active_administrator)
 ):  
     update_info = UpdateStaff(
         email=email,
         password=password,
         first_name=first_name,
         last_name=last_name,
-        patronymic=patronymic
+        patronymic=patronymic,
+        is_active=is_active
     )
+
+    if current_administrator.id == id and is_active == False:
+        raise http_e.CannotDisableCurrentUserException
 
     if email is not None:
         staff_with_similar_email = (

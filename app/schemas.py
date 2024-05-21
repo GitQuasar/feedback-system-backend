@@ -21,8 +21,8 @@ class ReadStaff(BaseModel):
     first_name: str
     last_name: str
     patronymic: str
-    is_active: bool = True
-    is_verified: bool = False
+    is_active: bool
+    is_verified: bool
     is_admin: Optional[bool] = False
     is_manager: Optional[bool] = False
     model_config = ConfigDict(from_attributes=True)
@@ -33,6 +33,7 @@ class UpdateStaff(BaseModel):
     first_name: Optional[str]
     last_name: Optional[str]
     patronymic: Optional[str]
+    is_active: bool
 
 class AddReview(BaseModel):
     review_creation_date: datetime

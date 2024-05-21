@@ -21,7 +21,7 @@ async def login_for_access_token(
 
     # Бросаем исключение, если (либо...либо):
     # Пользователя нет в БД, введённые данные неверны
-    if not user: raise http_e.InvalidCredentialsException
+    if not user or not user.is_active: raise http_e.InvalidCredentialsException
     role: str = Role.Admin if user.is_admin == True else Role.Manager 
 
     token_payload = {

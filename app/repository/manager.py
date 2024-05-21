@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy import select, desc, UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 

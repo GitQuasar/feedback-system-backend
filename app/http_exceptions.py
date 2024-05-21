@@ -1,3 +1,4 @@
+from ssl import HAS_NPN
 from typing import Annotated
 from fastapi import status, HTTPException
 
@@ -38,6 +39,10 @@ NoStaffInTheDatabaseException = HTTPException(
 CannotDeleteCurrentUserException = HTTPException(
     status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
     detail="Cannot delete current user")
+
+CannotDisableCurrentUserException = HTTPException(
+    status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+    detail="Cannot disable current user")
 
 UserAlreadyExistsException = HTTPException(
     status_code=status.HTTP_409_CONFLICT,
