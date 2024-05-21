@@ -30,8 +30,8 @@ async def see_reviews_on_page(
     # page: int | None = 1,
     session: AsyncSession = Depends(get_async_session)
     ):
-    reviews_on_page = await ManagerRepository.GetReviewsOnPage(session)
-    return {"reviews": reviews_on_page}
+    reviews = await ManagerRepository.GetReviewsOnPage(session)
+    return reviews
 
 @router.get(
         path="/manager/actions/see_reviews/{id}",
