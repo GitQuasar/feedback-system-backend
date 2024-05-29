@@ -24,10 +24,8 @@ async def read_current_manager_pc(current_manager: StaffORM = Depends(get_curren
 @router.get(
         path="/manager/actions/see_reviews",
         dependencies=[Depends(get_current_active_manager)],
-        # response_model=List[Review]
         )
-async def see_reviews_on_page(
-    # page: int | None = 1,
+async def see_reviews(
     session: AsyncSession = Depends(get_async_session)
     ):
     reviews = await ManagerRepository.GetReviewsOnPage(session)
@@ -46,6 +44,17 @@ async def see_review_by_uuid(
     if review is None:
         raise http_e.ReviewNotFoundException
     return review
+
+@router.get(
+        path="/manager/actions/search_in_reviews/",
+        dependencies=[Depends(get_current_active_manager)]
+        )
+async def search_in_reviews(
+    search_text: str | None = "",
+    session: AsyncSession = Depends(get_async_session)
+    ):
+    reviews = await ManagerRepository.SearchInReviews(session, search_text)
+    return reviews
 
 @router.post(
         path="/manager/actions/add_reply",

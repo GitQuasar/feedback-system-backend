@@ -1,5 +1,5 @@
 from typing import List
-from sqlalchemy import select, desc, UUID
+from sqlalchemy import func, select, desc, UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import ReviewsRegistryORM
@@ -44,3 +44,16 @@ class ManagerRepository:
         await session.commit()
         
         return review_in_db
+    
+    @classmethod
+    async def SearchInReviews(
+        cls,
+        session: AsyncSession,
+        search_query: str,
+        ):
+        query = select(ReviewsRegistryORM)\
+                .order_by(desc(ReviewsRegistryORM.review_creation_date))\
+                .filter(ReviewsRegistryORM.review_text.contains(search_query, autoescape=True))
+        result = await session.execute(query)
+        reviews = result.scalars().all()
+        return reviews
