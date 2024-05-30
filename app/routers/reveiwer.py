@@ -62,7 +62,7 @@ async def create_review(
     
     review = AddReview(
         # Красивый вывод: datetime.now(timezone.utc).strftime('%d.%m.%Y - %H:%M')
-        review_creation_date = datetime.utcnow(),
+        review_creation_date = datetime.now(),
         review_status = Status.Created,
         review_text = review_text,
         email = email,

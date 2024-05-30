@@ -10,7 +10,12 @@ async_session = async_sessionmaker(async_engine, expire_on_commit=False)
 # Генератор асинхронных сессий
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session() as session:
+        try:
             yield session
+        except Exception:
+            await session.rollback()
+        finally:
+            await session.close()
 
 # Базовая модель, от которой наследуются остальные модели
 class Base(DeclarativeBase):

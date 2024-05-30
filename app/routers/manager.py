@@ -71,7 +71,7 @@ async def create_manager_reply(
         review_status = Status.Replied,
         replied_manager_id = current_user.id,
         manager_reply_text = reply_text,
-        manager_reply_datetime = datetime.utcnow()
+        manager_reply_datetime = datetime.now()
     )
 
     review_updated = await ManagerRepository.AddReplyOnReviewByUUID(session, review_uuid, manager_reply)
